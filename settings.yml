@@ -1,6 +1,7 @@
 ---
 Questions:
   - question: "Question1"
-    keys: [ "q1a", "q01a", "_1a", "q1_a", "q01_a", "qo1a", "qo1_a" ]
+    keys: [ "q1", "q01"]
     grade: 25
     possible_grades: [0, 25]
+    base_code_file: "base_code/q01.py"

@@ -7,6 +7,7 @@ class Question:
     keys: list[str]
     possible_grades: list[float]
     grade: float
+    base_code: str
 
     def __post_init__(self):
         if self.grade not in self.possible_grades:
@@ -16,5 +17,7 @@ class Question:
         return {
             "question": self.question,
             "keys": self.keys,
-            "grade": self.grade
+            "grade": self.grade,
+            "possible_grades": self.possible_grades,
+            "base_code": self.base_code
         }
