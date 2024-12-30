@@ -17,8 +17,8 @@ for question_data in data["Questions"]:
         Question(
             question=question_data["question"],
             keys=question_data["keys"],
-            grade=float(question_data["grade"]),
-            possible_grades=[float(grade) for grade in question_data["possible_grades"]],
+            grade=int(question_data["grade"]),
+            possible_grades=[int(grade) for grade in question_data["possible_grades"]],
             base_code=base_code_file
         )
     )

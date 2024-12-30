@@ -82,6 +82,11 @@ class ClassroomBuilder:
                 is_graded={q_info.question.question: False for q_info in q_info}
             ))
 
+        for student in students:
+            for q_info in student.question_info:
+                if q_info.code == "":
+                    print(f"Student {student.name} {student.surname} did not submit a file for question {q_info.question.question}")
+
         return Classroom(students=students)
 
     def _get_student_question_info_list(self, submission_directory: str) -> list[StudentQuestionInfo]:
@@ -89,8 +94,7 @@ class ClassroomBuilder:
             submission_files = []
             for root, dirs, files in os.walk(submission_directory):
                 for file in files:
-                    if "macos" in root.lower():
-                        continue
+
                     if file.endswith(".py"):
                         submission_files.append(os.path.join(root, file))
 
@@ -159,3 +163,22 @@ def load_classroom_from_json(file_name: str) -> Classroom:
         students.append(student)
 
     return Classroom(students=students)
+
+def write_grades_to_excel(classroom: Classroom, file_name: str):
+    import pandas as pd
+
+    datas = {
+    }
+    for question in settings_loader.questions:
+        data = []
+        for student in classroom.students:
+            q_info = next(info for info in student.question_info if info.question.question == question.question)
+            data.append([student.name, student.surname, student.student_number, q_info.grade, student.is_graded[question.question]])
+
+        df = pd.DataFrame(data, columns=["Name", "Surname", "Student Number", "Grade", "Is Graded"])
+        datas[question.question] = df
+
+    with pd.ExcelWriter(file_name) as writer:
+        for key in datas:
+            datas[key].to_excel(writer, sheet_name=key, index=False)
+
