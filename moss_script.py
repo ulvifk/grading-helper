@@ -3,7 +3,10 @@ from moss_plag_checker import MossAPI
 
 
 QUESTION_NAMES = [
-    "Question1"
+     "Question1",
+    "Question2",
+    "Question3",
+    "Question4",
 ]
 
 def load_classroom() -> Classroom:
@@ -13,5 +16,6 @@ def load_classroom() -> Classroom:
 if __name__ == "__main__":
     classroom = load_classroom()
 
-    moss_api = MossAPI(classroom)
-    moss_api.run_moss(QUESTION_NAMES, "plag_report")
+    for question_name in QUESTION_NAMES:
+        moss_api = MossAPI(classroom)
+        moss_api.run_moss(question_name, f"plag_report/{question_name}")

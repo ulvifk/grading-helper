@@ -95,6 +95,9 @@ class ClassroomBuilder:
             for root, dirs, files in os.walk(submission_directory):
                 for file in files:
 
+                    if "macos" in root.lower():
+                        continue
+
                     if file.endswith(".py"):
                         submission_files.append(os.path.join(root, file))
 
