@@ -46,14 +46,15 @@ class ClassroomBuilder:
     def unzip(self) -> Self:
         for root, dirs, files in os.walk(self.directory):
             for file in files:
-                try:
-                    if file.endswith(".zip"):
-                        zip_path = os.path.join(root, file)
+                if file.endswith(".zip"):
+                    zip_path = os.path.join(root, file)
+                    extract_dir = os.path.join(root, f"extracted_{file[:-4]}")
+                    try:
+                        os.makedirs(extract_dir, exist_ok=True)
                         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                            zip_ref.extractall(root)
-                except Exception as e:
-                    print(f"Failed to unzip {file}. Reason: {e}")
-
+                            zip_ref.extractall(extract_dir)
+                    except Exception as e:
+                        print(f"Failed to unzip {file}. Reason: {e}")
         return self
 
     def build(self) -> Classroom:
@@ -113,7 +114,7 @@ class ClassroomBuilder:
             if respective_submission_file is None:
                 code = ""
             else:
-                with open(respective_submission_file, "r") as f:
+                with open(respective_submission_file, "r", encoding="utf-8") as f:
                     code = f.read()
 
             question_info = StudentQuestionInfo(
