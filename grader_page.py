@@ -1,5 +1,6 @@
 import contextlib
 import io
+import os.path
 import sys
 from time import sleep
 
@@ -9,7 +10,12 @@ print(st.__file__)
 
 from classroom_data import *
 
-classroom = load_classroom_from_json("classroom.json")
+if not os.path.exists("classroom.json"):
+    classroom = ClassroomBuilder("submissions").unzip().build()
+    save_classroom_to_json(classroom, "classroom.json")
+else:
+    classroom = load_classroom_from_json("classroom.json")
+
 _students = classroom.students
 questions = settings_loader.questions
 
@@ -37,6 +43,19 @@ def capture_stdout():
     finally:
         sys.stdout = old_stdout
 
+
+def reload_page():
+    js = '''
+        <script>
+            var body = window.parent.document.querySelector(".main");
+            console.log(body);
+            body.scrollTop = 0;
+        </script>
+        '''
+
+    st.components.v1.html(js)
+    sleep(0.1)
+    st.rerun()
 
 def grader_page():
     question_names = [question.question for question in questions]
@@ -78,7 +97,14 @@ def grader_page():
         else:
             st.write(f"**Not Graded**")
 
-    with open("dummy.py", "w") as f:
+        full_grade_button = st.button("Full Grade")
+        if full_grade_button:
+            question_info.grade = question.possible_grades[-1]
+            selected_student.is_graded[selected_question_name] = True
+            save_classroom_to_json(classroom, "classroom.json")
+            reload_page()
+
+    with open("dummy.py", "w", encoding="utf-8") as f:
         f.write(question_info.code)
 
     st.divider()
@@ -105,17 +131,7 @@ def grader_page():
 
     next_student_button = st.button("Next Student")
     if next_student_button:
-        js = '''
-        <script>
-            var body = window.parent.document.querySelector(".main");
-            console.log(body);
-            body.scrollTop = 0;
-        </script>
-        '''
-
-        st.components.v1.html(js)
-        sleep(0.1)
-        st.rerun()
+        reload_page()
 
 
 if __name__ == "__main__":
